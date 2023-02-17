@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
+import { withFirebase } from '../components/Firebase';
+import { Link, withRouter } from 'react-router-dom';
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import useStyles from '../config/theme.signinup';
-import {withRouter} from "react-router-dom";
-import {withFirebase} from "../components/Firebase";
 
-function SignIn() {
+import useStyles from '../config/theme.signinup';
+
+function SignUp(props) {
     const classes = useStyles();
 
-    const initialUser = {id: null, email: '', password: '', error: null, auth: null}
+    const initialUser = {id: null, name: '', email: '', password: '', error: null, auth: null}
 
     const [user, setUser] = useState(initialUser);
 
@@ -26,12 +26,18 @@ function SignIn() {
     }
 
     const handleSubmit = e => {
-
+        props.firebase.auth.createUserWithEmailAndPassword(user.email, user.password)
+            // Later add user also to database
+            .then(authUser => {
+                setUser(initialUser);
+                props.history.push("/dashboard");
+            })
+            .catch(error => {
+                setUser({...user, error: error.message})
+            });
     }
 
-    const isValid = user.email === '' || user.password === '';
-
-    console.log(user);
+    const isValid = user.name === '' || user.email === '' || user.password === '';
 
     return (
         <Grid container component="main" className={classes.root}>
@@ -43,9 +49,25 @@ function SignIn() {
                         <LockOutlinedIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Sign in
+                        Sign Up
                     </Typography>
-                    <form className={classes.form} noValidate>
+                    <form
+                        className={classes.form}
+                        noValidate
+                        onSubmit={e => e.preventDefault()}
+                    >
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="name"
+                            label="Name"
+                            name="name"
+                            autoFocus
+                            value={user.name}
+                            onChange={handleChange}
+                        />
                         <TextField
                             variant="outlined"
                             margin="normal"
@@ -70,6 +92,9 @@ function SignIn() {
                             autoComplete="current-password"
                             onChange={handleChange}
                         />
+                        <Typography className={classes.error}>
+                            {user.error ? user.error : ''}
+                        </Typography>
                         <Button
                             type="submit"
                             fullWidth
@@ -79,17 +104,12 @@ function SignIn() {
                             onClick={handleSubmit}
                             disabled={isValid}
                         >
-                            Sign In
+                            Sign up
                         </Button>
                         <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Forgot password?
-                                </Link>
-                            </Grid>
                             <Grid item>
-                                <Link href="sign-up">
-                                    Don't have an account? Sign Up
+                                <Link to="/">
+                                    {"Already have an account? Sign In"}
                                 </Link>
                             </Grid>
                         </Grid>
@@ -98,6 +118,6 @@ function SignIn() {
             </Grid>
         </Grid>
     );
-}
+};
 
-export default withRouter(withFirebase(SignIn));
+export default withRouter(withFirebase(SignUp));
