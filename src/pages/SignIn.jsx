@@ -1,19 +1,21 @@
+
 import React, { useState } from 'react';
+import { withFirebase } from '../components/Firebase';
+import { Link, withRouter } from 'react-router-dom';
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import useStyles from '../config/theme.signinup';
-import {withRouter} from "react-router-dom";
-import {withFirebase} from "../components/Firebase";
 
-function SignIn() {
+import useStyles from '../config/theme.signinup';
+
+
+function SignIn(props) {
     const classes = useStyles();
 
     const initialUser = {id: null, email: '', password: '', error: null, auth: null}
@@ -25,13 +27,18 @@ function SignIn() {
         setUser({...user, [name]: value})
     }
 
-    const handleSubmit = e => {
-
+    const handleSubmit = () => {
+        props.firebase.doSignInWithEmailAndPassword(user.email, user.password)
+            .then(authUser => {
+                setUser({initialUser})
+                props.history.push("/dashboard");
+            })
+            .catch(error => {
+                setUser({...user, error: error.message})
+            });
     }
 
     const isValid = user.email === '' || user.password === '';
-
-    console.log(user);
 
     return (
         <Grid container component="main" className={classes.root}>
@@ -45,7 +52,11 @@ function SignIn() {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <form className={classes.form} noValidate>
+                    <form
+                        className={classes.form}
+                        noValidate
+                        onSubmit={e => e.preventDefault()}
+                    >
                         <TextField
                             variant="outlined"
                             margin="normal"
@@ -70,6 +81,9 @@ function SignIn() {
                             autoComplete="current-password"
                             onChange={handleChange}
                         />
+                        <Typography className={classes.error}>
+                            {user.error ? user.error : ''}
+                        </Typography>
                         <Button
                             type="submit"
                             fullWidth
@@ -88,7 +102,7 @@ function SignIn() {
                                 </Link>
                             </Grid>
                             <Grid item>
-                                <Link href="sign-up">
+                                <Link href="/sign-up">
                                     Don't have an account? Sign Up
                                 </Link>
                             </Grid>
@@ -98,6 +112,6 @@ function SignIn() {
             </Grid>
         </Grid>
     );
-}
+};
 
 export default withRouter(withFirebase(SignIn));
