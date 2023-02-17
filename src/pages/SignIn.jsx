@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 
 import useStyles from '../config/theme.signinup';
+import PasswordForget from "../components/PasswordForget";
 
 
 function SignIn(props) {
@@ -97,13 +98,11 @@ function SignIn(props) {
                         </Button>
                         <Grid container>
                             <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Forgot password?
-                                </Link>
+                                <PasswordForget/>
                             </Grid>
                             <Grid item>
-                                <Link href="/sign-up">
-                                    Don't have an account? Sign Up
+                                <Link to="/sign-up">
+                                    {"Don't have an account? Sign up"}
                                 </Link>
                             </Grid>
                         </Grid>
