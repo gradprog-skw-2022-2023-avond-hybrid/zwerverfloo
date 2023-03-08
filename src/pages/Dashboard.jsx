@@ -1,7 +1,6 @@
 
 import React from 'react';
 
-import { withFirebase } from '../components/Firebase';
 import { withRouter } from 'react-router-dom';
 
 import clsx from 'clsx';
@@ -17,6 +16,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 
 import useStyles from '../config/theme.dashboard';
 import Sidebar from "../components/Sidebar";
+import { AuthUserContext, withAuthentication } from '../components/Session';
 
 function Dashboard(props) {
 
@@ -36,45 +36,50 @@ function Dashboard(props) {
     }
 
     return (
-        <div className={classes.root}>
-            <CssBaseline />
-            <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-                <Toolbar className={classes.toolbar}>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                        Dashboard
-                    </Typography>
-                    <IconButton color="inherit">
-                        <Badge badgeContent={4} color="secondary">
-                            <Typography component="p" style={{paddingRight: "15px"}}>
-                                username
+        <AuthUserContext.Consumer>
+            { authUser => authUser ? (
+                <div className={classes.root}>
+                    <CssBaseline />
+                    <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+                        <Toolbar className={classes.toolbar}>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={handleDrawerOpen}
+                                className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+                                Dashboard
                             </Typography>
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
+                            <IconButton color="inherit">
+                                <Badge badgeContent={4} color="secondary">
+                                    <Typography component="p" style={{paddingRight: "15px"}}>
+                                        username
+                                    </Typography>
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                        </Toolbar>
+                    </AppBar>
 
 
-            <Sidebar signOut={signOut} open={open} handleDrawerClose={handleDrawerClose} />
+                    <Sidebar signOut={signOut} open={open} handleDrawerClose={handleDrawerClose} />
 
-            <main className={clsx(classes.content, open ? classes.contentClosed : classes.appBarShift)}>
-                <div className={classes.appBarSpacer} />
-                <Container maxWidth="xl" className={classes.container}>
-                    Content
-                </Container>
-            </main>
+                    <main className={clsx(classes.content, open ? classes.contentClosed : classes.appBarShift)}>
+                        <div className={classes.appBarSpacer} />
+                        <Container maxWidth="xl" className={classes.container}>
+                            Content
+                        </Container>
+                    </main>
 
-        </div>
+                </div>
+            ) : ( <p>Not authorized!</p> ) }
+        </AuthUserContext.Consumer>
+
     );
 }
 
-export default withRouter(withFirebase(Dashboard));
+export default withRouter(withAuthentication(Dashboard));
