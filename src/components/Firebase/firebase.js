@@ -13,14 +13,15 @@ const config = {
     projectId: "zwerver-191b7",
     storageBucket: "zwerver-191b7.appspot.com",
     messagingSenderId: "775154586724",
-    appId: "1:775154586724:web:9942a3a2dc5ed00b197b71"
+    appId: "1:775154586724:web:9942a3a2dc5ed00b197b71",
+    databaseURL: "https://zwerver-191b7-default-rtdb.europe-west1.firebasedatabase.app/"
 };
 
 class Firebase {
     constructor() {
         app.initializeApp(config);
         this.auth = app.auth();
-        // this.db = app.database(); Later add database
+        this.db = app.database();
     }
 
     /*** Authentication  ***/
@@ -35,6 +36,9 @@ class Firebase {
 
     doPasswordReset = email =>
         this.auth.sendPasswordResetEmail(email);
+
+    user = uid => this.db.ref(`users/${uid}`);
+    users = () => this.db.ref('users');
 }
 
 export default Firebase;
